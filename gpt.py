@@ -14,20 +14,7 @@ chat_start = [
 def clear_chat_history():
     chat_history = chat_start
 
-def generate_reply(message):
-    # chat_history 添加用户输入
-    chat_history.append({"role": "user", "content": message})
-
-    chat = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages = chat_history,
-        )
-    print(chat.choices[0].message.get('content'))
-    # chat_history 添加助手回复
-    chat_history.append({"role": "assistant", "content": chat.choices[0].message.get('content')})
-
-    return chat.choices[0].message.get('content')
-
+# 识别用户的意图
 def define_command(message):
     propose = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -47,7 +34,23 @@ def define_command(message):
         return run_command(message)
     else:
         return generate_reply(message)
+    
+# 生成回复,并添加到chat_history
+def generate_reply(message):
+    # chat_history 添加用户输入
+    chat_history.append({"role": "user", "content": message})
 
+    chat = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages = chat_history,
+        )
+    print(chat.choices[0].message.get('content'))
+    # chat_history 添加助手回复
+    chat_history.append({"role": "assistant", "content": chat.choices[0].message.get('content')})
+
+    return chat.choices[0].message.get('content')
+
+# 识别为命令则执行webhook
 def run_command(command):
         completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
