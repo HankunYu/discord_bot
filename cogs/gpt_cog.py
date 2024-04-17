@@ -4,23 +4,23 @@ from discord.ext import commands
 sys.path.append("..") 
 import gpt
 
-class MPCog(commands.Cog):
+class Cog(commands.Cog):
     on_conversion = False
     current_channel = None
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    # 监听ready事件，bot准备好后打印登录信息
+    # listen to on_ready event and print bot info when bot is ready
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'bot 登录成功 - {self.bot.user}')
+        print(f'bot login - {self.bot.user}')
         game = discord.Game("看电影中...")
         await self.bot.change_presence(status=discord.Status.idle, activity=game)
         slash = await self.bot.tree.sync()
         print(f"已载入 {len(slash)} 个指令")
 
-    # 监听mention事件，使用gpt生成回复
+    # listen to on_message event and reply to user message
     @commands.Cog.listener()
     async def on_message(self,message):
         if message.author == self.bot.user:
@@ -31,7 +31,6 @@ class MPCog(commands.Cog):
             self.on_conversion = True
             self.current_channel = message.channel
             reply = gpt.generate_reply(msg)
-            print('reply: ', reply)
             if reply != None:
                 await message.channel.send(reply)
             else:
@@ -47,14 +46,5 @@ class MPCog(commands.Cog):
         await self.bot.change_presence(status=discord.Status.idle, activity=game)
         await interaction.response.send_message("^^")
 
-    @app_commands.command()
-    async def clear(self, interaction: discord.Interaction):
-        gpt.clear_chat_history()
-        await interaction.response.send_message("对话记录已经清除")
-
-    @app_commands.command(description="自动搜索并下载电影")
-    async def download(self, interaction: discord.Interaction, title: str):
-        await interaction.response.send_message("正在下载电影 " + title)
-
 async def setup(bot : commands.Bot):
-    await bot.add_cog(MPCog(bot))
+    await bot.add_cog(Cog(bot))

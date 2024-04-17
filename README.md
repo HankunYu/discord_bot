@@ -1,4 +1,4 @@
 # discord_bot
- a discord bot for movie pilot
 
- WIP
+A simple discord bot built with discord.py.
+Use ChatGPT to generate text based on user input.
